@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { FillInTheBlank as FillInTheBlankType } from '../types';
 
@@ -13,7 +12,8 @@ const FillInTheBlank: React.FC<FillInTheBlankProps> = ({ fillData, userAnswers, 
   
   const content = useMemo(() => {
     const parts = fillData.text.split(/{\d+}/);
-    const elements: (string | JSX.Element)[] = [];
+    // FIX: Replaced JSX.Element with React.ReactElement to resolve namespace issue.
+    const elements: (string | React.ReactElement)[] = [];
 
     parts.forEach((part, i) => {
       elements.push(part);
@@ -45,15 +45,29 @@ const FillInTheBlank: React.FC<FillInTheBlankProps> = ({ fillData, userAnswers, 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fillData, userAnswers, isSubmitted]);
 
+  const shuffledAnswers = useMemo(() => {
+    return [...fillData.answers].sort(() => Math.random() - 0.5);
+  }, [fillData.answers]);
+
   return (
     <div>
        <div className="font-bold text-slate-800 mb-4 flex items-start gap-3">
         <span className="flex-shrink-0 w-7 h-7 flex items-center justify-center bg-indigo-500 text-white rounded-lg font-bold text-sm">📝</span>
         <span>Preencha os espaços em branco:</span>
       </div>
-      <p className="text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-200">
+      <div className="text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-200">
         {content}
-      </p>
+      </div>
+      <div className="mt-4 p-4 bg-slate-100/70 rounded-lg">
+        <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">🗝️ Banco de Palavras</h4>
+        <div className="flex flex-wrap gap-2">
+          {shuffledAnswers.map((answer, index) => (
+            <span key={index} className="bg-slate-200 text-slate-700 text-sm px-3 py-1 rounded-full font-medium">
+              {answer}
+            </span>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
